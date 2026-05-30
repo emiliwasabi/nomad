@@ -1,8 +1,8 @@
-# Ambient Compass
+# Murmur
 
 Prototype iPhone de lecteur musical avec navigation spatiale par la musique.
 
-L'utilisateur ecoute de la musique et se oriente en suivant la position percue du son dans l'espace (gauche / droite / centre), guide par le prochain evenement Google Calendar avec adresse physique.
+L'utilisateur écoute de la musique et s'oriente en suivant la position percue du son dans l'espace (gauche / droite / centre), guidé par le prochain évènement Google Calendar.
 
 ## Configuration
 
