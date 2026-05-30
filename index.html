@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="css/player.css" />
+    <title>Ambient Compass</title>
+    <script defer src="config.local.js"></script>
+    <script defer src="js/guidance/guidanceMath.js"></script>
+    <script defer src="js/location/locationTracker.js"></script>
+    <script defer src="js/guidance/mapsAddressResolver.js"></script>
+    <script defer src="js/audio/spatialAudioBeginner.js"></script>
+    <script defer src="js/app/compass.js"></script>
+    <script defer src="js/app/routeService.js"></script>
+    <script defer src="js/app/calendarAuth.js"></script>
+    <script defer src="js/app/calendarNextEvent.js"></script>
+    <script defer src="js/app/musicLibrary.js"></script>
+    <script defer src="js/app/spatialNavigation.js"></script>
+    <script defer src="js/app/navigationEngine.js"></script>
+    <script defer src="js/app/playerApp.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1>Ambient Compass</h1>
+        <p class="subtitle">Suivez la musique dans l'espace</p>
+      </header>
+
+      <section class="panel now-playing">
+        <p id="track_title" class="track-title">Aucun morceau</p>
+        <p id="track_artist" class="track-artist">Bibliotheque locale</p>
+        <div class="controls">
+          <button id="play_button" type="button" class="btn btn-primary" disabled>
+            Play
+          </button>
+          <button id="pause_button" type="button" class="btn" disabled>Pause</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <label class="file-label">
+          Ajouter de la musique
+          <input id="library_input" type="file" accept="audio/*" multiple />
+        </label>
+        <ul id="library_list" class="library-list"></ul>
+      </section>
+
+      <section class="panel status-panel">
+        <button id="connect_calendar_button" type="button" class="btn btn-ghost">
+          Connecter Google Calendar
+        </button>
+        <p id="event_status" class="status-line">Prochain evenement: en attente</p>
+        <p id="nav_status" class="status-line">Navigation: inactive</p>
+        <p id="alignment_status" class="status-line">Alignement: —</p>
+      </section>
+    </div>
+
+    <script
+      defer
+      src="https://accounts.google.com/gsi/client"
+      onload="window.playerCalendarAuthInit && window.playerCalendarAuthInit()"
+    ></script>
+    <script
+      defer
+      src="https://apis.google.com/js/api.js"
+      onload="window.playerGapiInit && window.playerGapiInit()"
+    ></script>
+  </body>
+</html>
