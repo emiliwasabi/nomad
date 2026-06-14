@@ -48,17 +48,35 @@ async function connectCalendar() {
     );
     return;
   }
+  if (window.PlayerCalendarAuth.isAuthenticated?.()) {
+    calendarConnected = true;
+    ui.connectCalendarButton.textContent = "Google Calendar connecte";
+    setStatus("Prochain evenement: pret", null, null);
+    return;
+  }
   if (!window.PlayerCalendarAuth.isReady()) {
     setStatus("Google Calendar: initialisation...", null, null);
     return;
   }
   try {
+    if (window.PlayerCalendarAuth.usesRedirectOAuth?.()) {
+      setStatus("Redirection vers Google...", null, null);
+    }
     await window.PlayerCalendarAuth.requestAccess();
     calendarConnected = true;
     ui.connectCalendarButton.textContent = "Google Calendar connecte";
     setStatus("Prochain evenement: pret", null, null);
   } catch (error) {
     setStatus(`Calendar: ${error.message}`, null, null);
+  }
+}
+
+function onCalendarAuthenticated() {
+  calendarConnected = true;
+  ui.connectCalendarButton.textContent = "Google Calendar connecte";
+  if (sessionStorage.getItem("nomad_calendar_auth_pending")) {
+    sessionStorage.removeItem("nomad_calendar_auth_pending");
+    setStatus("Prochain evenement: pret", null, null);
   }
 }
 
@@ -196,10 +214,16 @@ function initPlayerApp() {
 
   window.addEventListener("player-calendar-ready", () => {
     ui.connectCalendarButton.disabled = false;
+    if (window.PlayerCalendarAuth.isAuthenticated?.()) {
+      onCalendarAuthenticated();
+      return;
+    }
     if (window.PlayerCalendarAuth.isReady()) {
       setStatus("Prochain evenement: connectez Google Calendar", null, null);
     }
   });
+
+  window.addEventListener("player-calendar-authenticated", onCalendarAuthenticated);
 
   window.setTimeout(() => {
     if (!window.GCAL_CONFIG?.CLIENT_ID || !window.GCAL_CONFIG?.API_KEY) {
@@ -224,10 +248,19 @@ function initPlayerApp() {
     window.MurmurBLE.onButtonPress = () => {
       togglePlayback();
     };
-    bleButton.addEventListener("click", async () => {
-      const ok = await window.MurmurBLE.connect();
-      bleButton.textContent = ok ? "Murmur connecte" : "Connecter Murmur";
-    });
+    if (!window.MurmurBLE.isSupported()) {
+      const hint = window.MurmurBLE.getUnsupportedHint();
+      bleButton.title = hint || "";
+      bleButton.addEventListener("click", () => {
+        setStatus(hint, null, null);
+      });
+    } else {
+      bleButton.addEventListener("click", async () => {
+        const ok = await window.MurmurBLE.connect();
+        bleButton.textContent = ok ? "Murmur connecte" : "Connecter bouton Murmur";
+        if (!ok) setStatus("Connexion BLE annulee ou echouee", null, null);
+      });
+    }
   }
 
   refreshPlayControls();

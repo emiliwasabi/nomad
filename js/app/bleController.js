@@ -3,13 +3,30 @@ const MURMUR_CHAR = "abcd1234-ab12-ab12-ab12-abcdef123456";
 
 let connectedDevice = null;
 
+function isIosDevice() {
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
 window.MurmurBLE = {
   onButtonPress: null,
   isConnected: () => Boolean(connectedDevice?.gatt?.connected),
 
+  isSupported: () => Boolean(navigator.bluetooth),
+
+  getUnsupportedHint() {
+    if (navigator.bluetooth) return null;
+    if (isIosDevice()) {
+      return "Sur iPhone : installer Bluefy (navigateur Web BLE), puis ouvrir cette page en HTTPS.";
+    }
+    return "Utilisez Chrome ou Edge sur ordinateur (HTTPS).";
+  },
+
   async connect() {
     if (!navigator.bluetooth) {
-      console.error("Web Bluetooth non disponible sur ce navigateur.");
+      console.error(window.MurmurBLE.getUnsupportedHint());
       return false;
     }
 
