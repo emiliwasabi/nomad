@@ -2,3 +2,4 @@ config.local.js
 .env
 .env.*
 .DS_Store
+server/.calendar-sessions.json

@@ -50,6 +50,10 @@ async function fetchUpcomingEvents(limit = 20) {
 }
 
 async function fetchNextEventWithLocation() {
+  if (window.PlayerCalendarBackend?.isRequired?.()) {
+    return window.PlayerCalendarBackend.fetchNextEventWithLocation();
+  }
+
   const events = await fetchUpcomingEvents();
   const next = events.find(hasPhysicalLocation);
   if (!next) return null;

@@ -39,7 +39,40 @@ function refreshPlayControls() {
   ui.pauseButton.disabled = !isPlaying;
 }
 
+async function connectCalendarViaBackend() {
+  const backend = window.PlayerCalendarBackend;
+  if (!backend.getBackendUrl()) {
+    setStatus(
+      "Bluefy bloque Google. Configurez CALENDAR_BACKEND_URL et deployez server/server.js.",
+      null,
+      null,
+    );
+    return;
+  }
+
+  if (await backend.checkStatus()) {
+    calendarConnected = true;
+    ui.connectCalendarButton.textContent = "Google Calendar connecte";
+    setStatus("Prochain evenement: pret", null, null);
+    return;
+  }
+
+  const link = backend.getAuthLink();
+  const copied = await backend.copyAuthLink();
+  setStatus(
+    copied
+      ? "Lien copie. Ouvrez Safari, collez le lien, connectez Google, puis revenez ici et appuyez a nouveau."
+      : `Ouvrez ce lien dans Safari:\n${link}`,
+    null,
+    null,
+  );
+}
+
 async function connectCalendar() {
+  if (window.PlayerCalendarBackend?.isRequired?.()) {
+    return connectCalendarViaBackend();
+  }
+
   if (!window.GCAL_CONFIG?.CLIENT_ID || !window.GCAL_CONFIG?.API_KEY) {
     setStatus(
       "Config manquante (config.local.js). Verifiez le deploiement GitHub Pages.",
@@ -225,10 +258,26 @@ function initPlayerApp() {
 
   window.addEventListener("player-calendar-authenticated", onCalendarAuthenticated);
 
-  window.setTimeout(() => {
+  window.setTimeout(async () => {
+    if (window.PlayerCalendarBackend?.isRequired?.()) {
+      if (await window.PlayerCalendarBackend.checkStatus()) {
+        onCalendarAuthenticated();
+        return;
+      }
+      setStatus(
+        "Bluefy: appuyez sur Connecter Calendar, ouvrez le lien dans Safari, puis reverifiez.",
+        null,
+        null,
+      );
+      return;
+    }
     if (!window.PlayerCalendarAuth.isReady()) {
-      setStatus(window.PlayerCalendarAuth.getInitErrorMessage?.() ||
-        "Google Calendar: echec d'initialisation.", null, null);
+      setStatus(
+        window.PlayerCalendarAuth.getInitErrorMessage?.() ||
+          "Google Calendar: echec d'initialisation.",
+        null,
+        null,
+      );
     }
   }, 8000);
 

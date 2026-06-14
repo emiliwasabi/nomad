@@ -56,13 +56,25 @@ Dans Google Cloud Console (Credentials → ton client OAuth Web) :
 
 ### Bluefy + Google Calendar
 
-Bluefy utilise une WebView : Google OAuth peut refuser la connexion (« navigateur non securise »).
-L'app bascule automatiquement en **mode redirect** sur iPhone/Bluefy.
+Bluefy **bloque les scripts Google** (`accounts.google.com`). Calendar ne peut pas marcher directement dans Bluefy.
 
-Si ca echoue encore :
-1. Verifie que l'**URI de redirection** ci-dessus est bien ajoutee dans Google Cloud Console
-2. Ouvre exactement la meme URL dans Bluefy que celle enregistree (avec ou sans `/` final)
-3. En dernier recours : connecte Calendar dans **Safari** sur le meme lien, puis rouvre Bluefy (le token ne se partage pas entre navigateurs — une solution serveur serait necessaire pour les deux en meme temps)
+**Solution : serveur intermediaire** (`server/server.js`)
+
+1. Deployer le serveur (Render gratuit, Railway, etc.)
+2. Variables d'environnement serveur :
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET` (depuis Google Cloud Console)
+   - `GOOGLE_REDIRECT_URI` = `https://VOTRE-SERVEUR.onrender.com/auth/calendar/callback`
+   - `GOOGLE_MAPS_API_KEY`
+3. Dans Google Cloud Console, ajouter l'URI de redirection ci-dessus
+4. Dans `config.local.js` / secrets GitHub : `CALENDAR_BACKEND_URL` = URL du serveur
+
+**Sur iPhone (Bluefy) :**
+1. Appuyer **Connecter Google Calendar** → le lien est copie
+2. Ouvrir **Safari**, coller le lien, se connecter a Google
+3. Revenir dans Bluefy, appuyer a nouveau **Connecter Google Calendar** pour verifier
+
+Sur Mac/Safari/Chrome, Calendar fonctionne toujours sans serveur (OAuth direct).
 
 Ajouter sur l'ecran d'accueil iPhone via Safari : Partager → Sur l'ecran d'accueil.
 

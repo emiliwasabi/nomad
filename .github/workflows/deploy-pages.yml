@@ -28,6 +28,7 @@ jobs:
           CLIENT_ID: ${{ secrets.GCAL_CLIENT_ID }}
           API_KEY: ${{ secrets.GCAL_API_KEY }}
           MAP_ID: ${{ secrets.GCAL_MAP_ID }}
+          CALENDAR_BACKEND_URL: ${{ secrets.GCAL_CALENDAR_BACKEND_URL }}
         run: |
           cat > config.local.js << EOF
           window.GCAL_CONFIG = {
@@ -35,6 +36,7 @@ jobs:
             API_KEY: "${API_KEY}",
             MAP_ID: "${MAP_ID}",
             OAUTH_REDIRECT_URI: "https://emiliwasabi.github.io/murmur/",
+            CALENDAR_BACKEND_URL: "${CALENDAR_BACKEND_URL}",
           };
           EOF
 
