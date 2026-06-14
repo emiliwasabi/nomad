@@ -59,8 +59,8 @@ function updateBleUi(connected) {
 }
 
 async function handleBleButtonClick() {
-  if (window.MurmurBLE.isConnected()) {
-    window.MurmurBLE.disconnect();
+  if (window.NomadBLE.isConnected()) {
+    window.NomadBLE.disconnect();
     updateBleUi(false);
     return;
   }
@@ -68,7 +68,7 @@ async function handleBleButtonClick() {
   updateBleUi(false);
   ui.bleStatus.textContent = "Bouton: connexion en cours...";
 
-  const ok = await window.MurmurBLE.connect();
+  const ok = await window.NomadBLE.connect();
   updateBleUi(ok);
   if (!ok) {
     ui.bleStatus.textContent = "Bouton: echec — reessayez";
@@ -322,21 +322,21 @@ function initPlayerApp() {
 
   const bleButton = ui.bleButton;
   if (bleButton) {
-    window.MurmurBLE.onButtonPress = () => {
+    window.NomadBLE.onButtonPress = () => {
       togglePlayback();
     };
-    if (!window.MurmurBLE.isSupported()) {
-      const hint = window.MurmurBLE.getUnsupportedHint();
+    if (!window.NomadBLE.isSupported()) {
+      const hint = window.NomadBLE.getUnsupportedHint();
       bleButton.title = hint || "";
       bleButton.addEventListener("click", () => {
         if (ui.bleStatus) ui.bleStatus.textContent = hint;
       });
     } else {
       bleButton.addEventListener("click", handleBleButtonClick);
-      window.addEventListener("murmur-ble-state", (event) => {
+      window.addEventListener("nomad-ble-state", (event) => {
         updateBleUi(event.detail.connected);
       });
-      updateBleUi(window.MurmurBLE.isConnected());
+      updateBleUi(window.NomadBLE.isConnected());
     }
   }
 

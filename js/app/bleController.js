@@ -1,5 +1,5 @@
-const MURMUR_SERVICE = "12345678-1234-1234-1234-123456789abc";
-const MURMUR_CHAR = "abcd1234-ab12-ab12-ab12-abcdef123456";
+const NOMAD_SERVICE = "12345678-1234-1234-1234-123456789abc";
+const NOMAD_CHAR = "abcd1234-ab12-ab12-ab12-abcdef123456";
 
 let connectedDevice = null;
 let monitorTimer = null;
@@ -13,7 +13,7 @@ function isIosDevice() {
 
 function dispatchBleState(connected) {
   window.dispatchEvent(
-    new CustomEvent("murmur-ble-state", { detail: { connected } }),
+    new CustomEvent("nomad-ble-state", { detail: { connected } }),
   );
 }
 
@@ -28,7 +28,7 @@ function startConnectionMonitor() {
   }, 1500);
 }
 
-window.MurmurBLE = {
+window.NomadBLE = {
   onButtonPress: null,
   isConnected: () => Boolean(connectedDevice?.gatt?.connected),
 
@@ -52,7 +52,7 @@ window.MurmurBLE = {
 
   async connect() {
     if (!navigator.bluetooth) {
-      console.error(window.MurmurBLE.getUnsupportedHint());
+      console.error(window.NomadBLE.getUnsupportedHint());
       dispatchBleState(false);
       return false;
     }
@@ -64,33 +64,33 @@ window.MurmurBLE = {
       }
 
       const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [MURMUR_SERVICE] }],
-        optionalServices: [MURMUR_SERVICE],
+        filters: [{ services: [NOMAD_SERVICE] }],
+        optionalServices: [NOMAD_SERVICE],
         acceptAllDevices: false,
       });
 
       device.addEventListener("gattserverdisconnected", () => {
         connectedDevice = null;
         dispatchBleState(false);
-        console.log("Murmur BLE deconnecte");
+        console.log("Nomad BLE deconnecte");
       });
 
       const server = await device.gatt.connect();
-      const service = await server.getPrimaryService(MURMUR_SERVICE);
-      const characteristic = await service.getCharacteristic(MURMUR_CHAR);
+      const service = await server.getPrimaryService(NOMAD_SERVICE);
+      const characteristic = await service.getCharacteristic(NOMAD_CHAR);
 
       await characteristic.startNotifications();
       characteristic.addEventListener("characteristicvaluechanged", (event) => {
         const message = new TextDecoder().decode(event.target.value).trim();
         if (message !== "play") return;
-        console.log("[Murmur BLE] play");
-        window.MurmurBLE.onButtonPress?.();
+        console.log("[Nomad BLE] play");
+        window.NomadBLE.onButtonPress?.();
       });
 
       connectedDevice = device;
       startConnectionMonitor();
       dispatchBleState(true);
-      console.log("Murmur BLE connecte");
+      console.log("Nomad BLE connecte");
       return true;
     } catch (error) {
       dispatchBleState(false);

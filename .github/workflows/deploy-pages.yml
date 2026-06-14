@@ -43,7 +43,7 @@ jobs:
             CLIENT_ID: "${CLIENT_ID}",
             API_KEY: "${API_KEY}",
             MAP_ID: "${MAP_ID}",
-            OAUTH_REDIRECT_URI: "https://emiliwasabi.github.io/murmur/",
+            OAUTH_REDIRECT_URI: "https://emiliwasabi.github.io/nomad/",
             CALENDAR_BACKEND_URL: "${CALENDAR_BACKEND_URL}",
           };
           EOF

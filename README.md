@@ -21,11 +21,11 @@ L'upload de fichiers reste disponible en option.
 
 ## Bouton BLE (XIAO ESP32-S3)
 
-Sketch : `firmware/murmur_button/murmur_button.ino`
+Sketch : `firmware/nomad_button/nomad_button.ino`
 
-1. Flasher le firmware (corrige `GATT_INSUF_AUTHENTICATION` : pas de pairing requis)
-2. **Mac/Android** : Chrome + HTTPS. **iPhone** : app [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) (Chrome iOS ne supporte pas Web Bluetooth)
-3. Cliquer **Connecter bouton Murmur**, puis appuyer sur le bouton physique
+1. Flasher le firmware
+2. **Mac/Android** : Chrome + HTTPS. **iPhone** : app [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)
+3. Cliquer **Connecter le bouton**, puis appuyer sur le bouton physique
 
 ## Lancer en local (Mac)
 
@@ -46,13 +46,13 @@ Ouvrir : http://127.0.0.1:5500/
 1. Ajouter les secrets Actions : `GCAL_CLIENT_ID`, `GCAL_API_KEY`, `GCAL_MAP_ID`
 2. Settings → Pages → Source : **GitHub Actions**
 3. Pousser sur `main` — le workflow `.github/workflows/deploy-pages.yml` genere `config.local.js` et deploie
-4. Ouvrir sur l'iPhone : `https://emiliwasabi.github.io/murmur/`
+4. Ouvrir sur l'iPhone : `https://emiliwasabi.github.io/nomad/`
 
 Dans Google Cloud Console (Credentials → ton client OAuth Web) :
 - **Origines JavaScript autorisees** : `https://emiliwasabi.github.io`
 - **URI de redirection autorisees** (obligatoire pour Bluefy/iPhone) :
-  - `https://emiliwasabi.github.io/murmur/`
-- **Referrer API key** : `https://emiliwasabi.github.io/murmur/*`
+  - `https://emiliwasabi.github.io/nomad/`
+- **Referrer API key** : `https://emiliwasabi.github.io/nomad/*`
 
 ### Bluefy + Google Calendar
 
