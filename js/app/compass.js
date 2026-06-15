@@ -5,6 +5,19 @@ let onHeadingChange = null;
 let lastEmitMs = 0;
 const EMIT_MS = 50;
 
+const debug = {
+  eventCount: 0,
+  lastEventMs: 0,
+  rawWebkit: null,
+  rawAlpha: null,
+  rawAbsolute: false,
+  permissionLabel: "inconnu",
+  permissionNeedsPrompt: false,
+  lastPermissionReason: null,
+  headingDelta: 0,
+  lastHeadingSample: null,
+};
+
 function readHeadingFromEvent(event) {
   if (
     typeof event.webkitCompassHeading === "number" &&
@@ -19,8 +32,22 @@ function readHeadingFromEvent(event) {
 }
 
 function onDeviceOrientation(event) {
+  debug.eventCount += 1;
+  debug.lastEventMs = Date.now();
+  debug.rawWebkit =
+    typeof event.webkitCompassHeading === "number" ? event.webkitCompassHeading : null;
+  debug.rawAlpha = typeof event.alpha === "number" ? event.alpha : null;
+  debug.rawAbsolute = Boolean(event.absolute);
+
   const heading = readHeadingFromEvent(event);
   if (heading === null || Number.isNaN(heading)) return;
+
+  if (debug.lastHeadingSample !== null) {
+    let delta = Math.abs(heading - debug.lastHeadingSample);
+    if (delta > 180) delta = 360 - delta;
+    debug.headingDelta = Math.max(debug.headingDelta * 0.9, delta);
+  }
+  debug.lastHeadingSample = heading;
   headingDeg = heading;
 
   if (!onHeadingChange) return;
@@ -45,21 +72,31 @@ function detachListeners() {
 }
 
 async function ensurePermission() {
-  if (permissionGranted) return { granted: true };
+  if (permissionGranted) {
+    debug.permissionLabel = "accordee";
+    return { granted: true };
+  }
 
   if (
     typeof DeviceOrientationEvent === "undefined" ||
     typeof DeviceOrientationEvent.requestPermission !== "function"
   ) {
     permissionGranted = true;
+    debug.permissionLabel = "non requise (desktop)";
+    debug.permissionNeedsPrompt = false;
     return { granted: true, legacy: true };
   }
 
+  debug.permissionNeedsPrompt = true;
   try {
     const state = await DeviceOrientationEvent.requestPermission(true);
     permissionGranted = state === "granted";
+    debug.permissionLabel = state;
+    debug.lastPermissionReason = state;
     return { granted: permissionGranted, denied: state === "denied" };
   } catch (error) {
+    debug.permissionLabel = `erreur: ${error.message}`;
+    debug.lastPermissionReason = error.message;
     return { granted: false, error: error.message };
   }
 }
@@ -101,10 +138,28 @@ function setOnHeadingChange(callback) {
   lastEmitMs = 0;
 }
 
+function getDebugState() {
+  return {
+    compassActive,
+    permissionGranted,
+    permissionLabel: debug.permissionLabel,
+    permissionNeedsPrompt: debug.permissionNeedsPrompt,
+    lastPermissionReason: debug.lastPermissionReason,
+    eventCount: debug.eventCount,
+    lastEventMs: debug.lastEventMs,
+    rawWebkit: debug.rawWebkit,
+    rawAlpha: debug.rawAlpha,
+    rawAbsolute: debug.rawAbsolute,
+    headingDeg,
+    headingDelta: debug.headingDelta,
+  };
+}
+
 window.PlayerCompass = {
   start: startCompass,
   stop: stopCompass,
   getHeadingDeg,
   setOnHeadingChange,
   isActive: isCompassActive,
+  getDebugState,
 };

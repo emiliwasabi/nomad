@@ -7,6 +7,9 @@ let navState = {
   routeWaypoints: [],
   lastPosition: null,
   intervalMs: 2500,
+  lastRelativeDeg: null,
+  headingUpdateCount: 0,
+  lastGpsMs: 0,
 };
 
 function computeRelativeBearing(position, headingDeg) {
@@ -48,6 +51,7 @@ function applyBearingUpdate(position, heading) {
   const relative = computeRelativeBearing(position, heading);
   if (relative === null) return;
 
+  navState.lastRelativeDeg = relative;
   window.PlayerSpatialNav.updateRelativeBearing(relative);
 
   window.dispatchEvent(
@@ -59,11 +63,13 @@ function applyBearingUpdate(position, heading) {
 
 function onHeadingUpdate(heading) {
   if (!navState.active || !navState.destination || !navState.lastPosition) return;
+  navState.headingUpdateCount += 1;
   applyBearingUpdate(navState.lastPosition, heading);
 }
 
 function onLocationUpdate(position) {
   navState.lastPosition = position;
+  navState.lastGpsMs = Date.now();
   if (!navState.active || !navState.destination) return;
 
   maybeFetchRoute(position);
@@ -120,4 +126,12 @@ window.PlayerNavigationEngine = {
   isActive,
   buildStatus,
   getLastPosition: () => navState.lastPosition,
+  getDebugState: () => ({
+    active: navState.active,
+    lastRelativeDeg: navState.lastRelativeDeg,
+    headingUpdateCount: navState.headingUpdateCount,
+    lastGpsMs: navState.lastGpsMs,
+    hasDestination: Boolean(navState.destination),
+    hasPosition: Boolean(navState.lastPosition),
+  }),
 };

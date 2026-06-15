@@ -2,6 +2,8 @@ let currentX = 0;
 let currentZ = 1;
 let active = false;
 const SMOOTHING = 0.18;
+let lastRelativeDeg = null;
+let updateCount = 0;
 
 function toRad(deg) {
   return (deg * Math.PI) / 180;
@@ -31,6 +33,9 @@ function stopSpatialNav() {
 function updateRelativeBearing(relativeDeg) {
   if (!active || typeof window.setSoundDirection !== "function") return;
 
+  lastRelativeDeg = relativeDeg;
+  updateCount += 1;
+
   const targetRad = toRad(relativeDeg);
   const targetX = Math.sin(targetRad);
   const targetZ = Math.cos(targetRad);
@@ -55,4 +60,11 @@ window.PlayerSpatialNav = {
   stop: stopSpatialNav,
   updateRelativeBearing,
   getAlignmentLabel,
+  getDebugState: () => ({
+    active,
+    currentX,
+    currentZ,
+    lastRelativeDeg,
+    updateCount,
+  }),
 };

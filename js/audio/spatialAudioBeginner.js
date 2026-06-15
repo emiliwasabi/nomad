@@ -161,7 +161,18 @@ function setSoundDirection(x, y = 0, z = 0) {
   panner.positionX.value = x;
   panner.positionY.value = y;
   panner.positionZ.value = z;
-  console.log(`[SpatialAudio] Direction x=${x}, y=${y}, z=${z}`);
+}
+
+function getSpatialAudioDebugState() {
+  return {
+    pannerX: panner ? panner.positionX.value : null,
+    pannerY: panner ? panner.positionY.value : null,
+    pannerZ: panner ? panner.positionZ.value : null,
+    audioCtxState: audioCtx?.state || null,
+    audioCtxRunning: audioCtx?.state === "running",
+    hasPanner: Boolean(panner),
+    hasMedia: Boolean(mediaElement),
+  };
 }
 
 function setGuidanceAudioMode(enabled) {
@@ -223,6 +234,7 @@ window.setSpatialAudioFile = setSpatialAudioFile;
 window.setSpatialAudioSource = setSpatialAudioSource;
 window.startSpatialMusic = startSpatialMusic;
 window.setSoundDirection = setSoundDirection;
+window.getSpatialAudioDebugState = getSpatialAudioDebugState;
 window.setGuidanceAudioMode = setGuidanceAudioMode;
 window.setGuidanceDirectionBucket = setGuidanceDirectionBucket;
 window.startOrbitAroundHead = startOrbitAroundHead;

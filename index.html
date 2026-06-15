@@ -29,6 +29,7 @@
     <script defer src="js/app/musicLibrary.js"></script>
     <script defer src="js/app/spatialNavigation.js"></script>
     <script defer src="js/app/navigationEngine.js"></script>
+    <script defer src="js/app/debugPanel.js"></script>
     <script defer src="js/app/playerApp.js"></script>
     <script defer src="js/app/bleController.js"></script>
   </head>
@@ -77,6 +78,10 @@
         <button id="ble_connect_button" type="button" class="btn btn-ghost">
           Connecter le bouton
         </button>
+      </section>
+
+      <section id="debug_panel" class="panel debug-panel" hidden>
+        <p class="debug-hint">Tapez 3× sur « Nomad » pour afficher/masquer</p>
       </section>
     </div>
   </body>

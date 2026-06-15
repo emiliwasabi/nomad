@@ -143,3 +143,71 @@ body {
 .ble-status.disconnected {
   color: #c44;
 }
+
+.debug-panel {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  background: #111;
+  color: #d8ffd8;
+  border-color: #333;
+}
+
+.debug-hint {
+  margin: 0 0 0.5rem;
+  color: #9a9;
+}
+
+.debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.debug-hide {
+  width: auto;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.7rem;
+  color: #d8ffd8;
+  border-color: #444;
+}
+
+.debug-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.15rem 0;
+  border-bottom: 1px solid #222;
+}
+
+.debug-line span {
+  color: #9a9;
+}
+
+.debug-warn strong {
+  color: #ffb454;
+}
+
+.debug-issues p,
+.debug-ok {
+  margin: 0 0 0.5rem;
+  color: #ffb454;
+}
+
+.debug-ok {
+  color: #7dffa0;
+}
+
+.debug-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.debug-actions .btn {
+  font-size: 0.75rem;
+  background: #2a2a2a;
+  color: #d8ffd8;
+}
