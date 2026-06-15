@@ -44,15 +44,7 @@ async function maybeFetchRoute(position) {
   );
 }
 
-function onLocationUpdate(position) {
-  navState.lastPosition = position;
-  if (!navState.active || !navState.destination) return;
-
-  maybeFetchRoute(position);
-
-  const heading =
-    window.PlayerCompass.getHeadingDeg() ??
-    (Number.isFinite(position.heading) ? position.heading : 0);
+function applyBearingUpdate(position, heading) {
   const relative = computeRelativeBearing(position, heading);
   if (relative === null) return;
 
@@ -65,6 +57,23 @@ function onLocationUpdate(position) {
   );
 }
 
+function onHeadingUpdate(heading) {
+  if (!navState.active || !navState.destination || !navState.lastPosition) return;
+  applyBearingUpdate(navState.lastPosition, heading);
+}
+
+function onLocationUpdate(position) {
+  navState.lastPosition = position;
+  if (!navState.active || !navState.destination) return;
+
+  maybeFetchRoute(position);
+
+  const heading =
+    window.PlayerCompass.getHeadingDeg() ??
+    (Number.isFinite(position.heading) ? position.heading : 0);
+  applyBearingUpdate(position, heading);
+}
+
 async function startNavigation(destination) {
   stopNavigation();
 
@@ -72,6 +81,7 @@ async function startNavigation(destination) {
   navState.active = true;
 
   window.PlayerCompass.start();
+  window.PlayerCompass.setOnHeadingChange(onHeadingUpdate);
   window.PlayerSpatialNav.start();
 
   navState.trackerId = window.startLocationTracking({
@@ -95,6 +105,7 @@ function stopNavigation() {
     navState.trackerId = null;
   }
 
+  window.PlayerCompass.setOnHeadingChange(null);
   window.PlayerCompass.stop();
   window.PlayerSpatialNav.stop();
 }
