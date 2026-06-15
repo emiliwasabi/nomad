@@ -80,7 +80,7 @@ async function startNavigation(destination) {
   navState.destination = destination;
   navState.active = true;
 
-  window.PlayerCompass.start();
+  await window.PlayerCompass.start();
   window.PlayerCompass.setOnHeadingChange(onHeadingUpdate);
   window.PlayerSpatialNav.start();
 

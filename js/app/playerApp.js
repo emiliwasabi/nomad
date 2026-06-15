@@ -70,6 +70,9 @@ async function handleBleButtonClick() {
 
   const ok = await window.NomadBLE.connect();
   updateBleUi(ok);
+  if (ok) {
+    await window.PlayerCompass.start();
+  }
   if (!ok) {
     ui.bleStatus.textContent = "Bouton: echec — reessayez";
     ui.bleStatus.classList.add("disconnected");
@@ -194,6 +197,8 @@ async function togglePlayback() {
 async function startPlaybackSession() {
   if (window.PlayerMusicLibrary.getTrackCount() === 0) return;
 
+  const compass = await window.PlayerCompass.start();
+
   const track = window.PlayerMusicLibrary.pickRandomTrack();
   const source = window.PlayerMusicLibrary.getTrackSource(track);
   if (!source) return;
@@ -212,10 +217,13 @@ async function startPlaybackSession() {
     const destination = await resolveDestinationFromCalendar();
     if (destination) {
       await window.PlayerNavigationEngine.start(destination);
+      const alignLine = compass.ok
+        ? "Alignement: en cours..."
+        : "Boussole: autorisez le capteur (appuyez Play a l'ecran)";
       setStatus(
         `${destination.eventTime} — ${destination.label}\nLieu: ${destination.address}`,
         `Navigation: vers ${destination.label}`,
-        "Alignement: en cours...",
+        alignLine,
       );
     } else {
       window.PlayerSpatialNav.start();
