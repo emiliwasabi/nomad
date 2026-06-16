@@ -4,7 +4,10 @@ let mediaElement = null;
 let mediaSource = null;
 let mediaObjectUrl = null;
 let gainNode = null;
+let stereoPanner = null;
 let panner = null;
+const POSITION_RADIUS = 2.8;
+const STEREO_EXAGGERATION = 1.4;
 let orbitTimer = null;
 let orbitAngle = 0;
 let isGuidanceAudioMode = false;
@@ -28,18 +31,20 @@ function ensureAudioGraph() {
   if (!audioCtx || gainNode || panner) return;
 
   gainNode = audioCtx.createGain();
+  stereoPanner = audioCtx.createStereoPanner();
   panner = new PannerNode(audioCtx, {
     panningModel: "HRTF",
     distanceModel: "inverse",
     positionX: 1,
     positionY: 0,
     positionZ: 0,
-    refDistance: 1,
+    refDistance: 0.6,
     maxDistance: 1000,
-    rolloffFactor: 1,
+    rolloffFactor: 0.4,
   });
 
-  gainNode.connect(panner);
+  gainNode.connect(stereoPanner);
+  stereoPanner.connect(panner);
   panner.connect(audioCtx.destination);
 }
 
@@ -158,9 +163,21 @@ async function startSpatialMusic() {
 
 function setSoundDirection(x, y = 0, z = 0) {
   if (!panner) return;
-  panner.positionX.value = x;
+
+  const len = Math.hypot(x, z) || 1;
+  const nx = x / len;
+  const nz = z / len;
+
+  panner.positionX.value = nx * POSITION_RADIUS;
   panner.positionY.value = y;
-  panner.positionZ.value = z;
+  panner.positionZ.value = nz * POSITION_RADIUS;
+
+  if (stereoPanner) {
+    stereoPanner.pan.value = Math.max(
+      -1,
+      Math.min(1, nx * STEREO_EXAGGERATION),
+    );
+  }
 }
 
 function getSpatialAudioDebugState() {

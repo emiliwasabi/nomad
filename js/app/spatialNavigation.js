@@ -1,7 +1,9 @@
 let currentX = 0;
 let currentZ = 1;
 let active = false;
-const SMOOTHING = 0.18;
+const SMOOTHING = 0.45;
+const BEARING_EXAGGERATION = 1.6;
+const CENTER_DEADZONE_DEG = 8;
 let lastRelativeDeg = null;
 let updateCount = 0;
 
@@ -30,13 +32,21 @@ function stopSpatialNav() {
   }
 }
 
+function exaggerateBearing(deg) {
+  const sign = Math.sign(deg) || 1;
+  const abs = Math.abs(deg);
+  if (abs <= CENTER_DEADZONE_DEG) return deg * 0.35;
+  const boosted = CENTER_DEADZONE_DEG * 0.35 + (abs - CENTER_DEADZONE_DEG) * BEARING_EXAGGERATION;
+  return sign * Math.min(boosted, 165);
+}
+
 function updateRelativeBearing(relativeDeg) {
   if (!active || typeof window.setSoundDirection !== "function") return;
 
   lastRelativeDeg = relativeDeg;
   updateCount += 1;
 
-  const targetRad = toRad(relativeDeg);
+  const targetRad = toRad(exaggerateBearing(relativeDeg));
   const targetX = Math.sin(targetRad);
   const targetZ = Math.cos(targetRad);
 
